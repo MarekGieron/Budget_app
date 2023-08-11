@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Savings List{% endblock %}
+
+{% block content %}
+    <h1>Savings List</h1>
+    <a href="{% url 'create-savings' %}">Create a New Savings Goal</a>
+    <ul>
+        {% for saving in savings %}
+            <li>
+                {{ saving.name }} - {{ saving.amount }} ({{ saving.target_date }})
+                <form method="post" action="{% url 'delete-savings' saving.pk %}">
+                    {% csrf_token %}
+                    <button type="submit">Delete</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

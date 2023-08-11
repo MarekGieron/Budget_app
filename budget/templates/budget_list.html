@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Budget List{% endblock %}
+
+{% block content %}
+    <h1>Budget List</h1>
+    <ul>
+        {% for budget in budgets %}
+            <li>{{ budget.name }} - {{ budget.total_income }} ({{ budget.start_date }} - {{ budget.end_date }})</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'create-budget' %}">Create a new budget</a>
+    <a href="{% url 'move-to-savings' %}">Move to Savings</a>
+{% endblock %}

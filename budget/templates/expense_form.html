@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Expense{% endblock %}
+
+{% block content %}
+    <h1>Add Expense</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.category.label_tag }} {{ form.category }}<br>
+        {{ form.description.label_tag }} {{ form.description }}<br>
+        {{ form.amount.label_tag }} {{ form.amount }}<br>
+        <label for="{{ form.date.id_for_label }}">Date:</label>
+        <input type="date" name="{{ form.date.name }}" value="{{ form.date.value|default:'' }}"><br>
+        <button type="submit">Add Expense</button>
+    </form>
+    <a href="{% url 'expense-list' %}">Back to Expense List</a>
+{% endblock %}

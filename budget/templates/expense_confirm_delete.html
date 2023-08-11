@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Usuń wydatek: {{ object }}</h2>
+  <form method="post">
+    {% csrf_token %}
+    <p>Czy na pewno chcesz usunąć ten wydatek?</p>
+    <button type="submit">Tak, usuń</button>
+    <a href="{% url 'expense-list' %}">Anuluj</a>
+  </form>
+{% endblock %}

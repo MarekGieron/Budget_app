@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Expense Category{% endblock %}
+
+{% block content %}
+    <h1>Add Expense Category</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add Category</button>
+    </form>
+    <a href="{% url 'expense-list' %}">Back to Expenses</a>
+
+    <h2>Existing Categories</h2>
+    <ul>
+        {% for category in categories %}
+            <li>
+                {{ category.name }}
+                <a href="{% url 'delete-expense-category' category.id %}">Delete</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

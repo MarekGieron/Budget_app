@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Income List{% endblock %}
+
+{% block content %}
+    <h1>Income List</h1>
+    <ul>
+        {% for income in incomes %}
+            <li>
+                {{ income.amount }} - {{ income.source }} - {{ income.date }}
+                <form method="post" action="{% url 'income-delete' income.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Delete</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'income-form' %}">Add Income</a>
+{% endblock %}

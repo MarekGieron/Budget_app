@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Savings{% endblock %}
+
+{% block content %}
+  <h2>Delete Savings</h2>
+  <p>Are you sure you want to delete "{{ savings.name }}"?</p>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Delete</button>
+  </form>
+  <a href="{% url 'savings-list' %}">Cancel</a>
+{% endblock %}

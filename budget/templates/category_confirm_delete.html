@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Usuń kategorię: {{ object }}</h2>
+  <form method="post">
+    {% csrf_token %}
+    <p>Czy na pewno chcesz usunąć kategorię "{{ object }}"?</p>
+    <button type="submit">Tak, usuń</button>
+    <a href="{% url 'name-of-list-view' %}">Anuluj</a>  <!-- Zastąp 'name-of-list-view' nazwą widoku listy kategorii -->
+  </form>
+{% endblock %}
