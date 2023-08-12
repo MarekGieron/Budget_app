@@ -6,6 +6,9 @@ from django.urls import reverse
 
 
 class Income(models.Model):
+    """
+    Model representing an income record.
+    """
     source = models.CharField(max_length=100)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateField()
@@ -16,6 +19,9 @@ class Income(models.Model):
 
 
 class Expense(models.Model):
+    """
+    Model representing an expense record.
+    """
     category = models.ForeignKey('ExpenseCategory', on_delete=models.CASCADE)
     description = models.TextField()
     amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -32,6 +38,9 @@ class Expense(models.Model):
 
 
 class Budget(models.Model):
+    """
+    Model representing a budget.
+    """
     name = models.CharField(max_length=100, default="Nowy Budżet")
     total_income = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     savings = models.ManyToManyField('Savings', related_name='budgets', blank=True)
@@ -46,6 +55,9 @@ class Budget(models.Model):
 
 
 class Savings(models.Model):
+    """
+    Model representing savings goals.
+    """
     name = models.CharField(max_length=100, unique=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     target_date = models.DateField(null=True, blank=True)
@@ -63,7 +75,9 @@ class Savings(models.Model):
 
 class ExpenseCategory(models.Model):
     name = models.CharField(max_length=100, unique=True)
-
+    """
+    Model representing expense categories.
+    """
     def __str__(self):
         return self.name
 
@@ -77,11 +91,11 @@ def delete(self, *args, **kwargs):
 
 @receiver(post_save, sender=Income)
 def update_budget_total_income(sender, instance, **kwargs):
-    # Aktualizuj pole 'budget' w modelu Income
+    # Update 'budget' field in the Income model
     instance.budget.total_income += instance.amount
     instance.budget.save()
 
-    # Aktualizuj pole 'total_income' w modelu Budget
+    # Update 'total_income' field in the Budget model
     total_income = Income.objects.filter(budget=instance.budget).aggregate(total_income=models.Sum('amount'))['total_income'] or 0
     instance.budget.total_income = total_income
     instance.budget.save()

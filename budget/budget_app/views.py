@@ -26,18 +26,22 @@ def create_user_view(request):
 
 
 class CustomLoginView(LoginView):
-    template_name = 'login.html'  # Twoje własne szablony logowania
+    """Custom login view with redirection and initial user creation."""
+    template_name = 'login.html'
 
     def get(self, request, *args, **kwargs):
         if User.objects.count() == 0:
-            return redirect('create_user')  # Przekierowanie do tworzenia użytkownika
+            return redirect('create_user')  # Redirect to user creation if no users exist
         return super().get(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse_lazy('income-list')  # Przekierowanie po udanym logowaniu
+        return reverse_lazy('income-list')  # Redirect after successful login
 
 
 class IncomeListView(View):
+    """
+    View for listing and managing income entries.
+    """
     template_name = 'income_list.html'
 
     @method_decorator(login_required)
@@ -81,6 +85,9 @@ class IncomeListView(View):
 
 
 class IncomeFormView(View):
+    """
+    View for handling the income form.
+    """
     @method_decorator(login_required)
     def get(self, request):
         form = IncomeForm()
@@ -102,6 +109,9 @@ class IncomeFormView(View):
 
 
 class ExpenseListView(View):
+    """
+    View for listing expenses.
+    """
     @method_decorator(login_required)
     def get(self, request):
         expenses = Expense.objects.all()
@@ -109,6 +119,9 @@ class ExpenseListView(View):
 
 
 class BudgetListView(View):
+    """
+    View for listing budgets.
+    """
     @method_decorator(login_required)
     def get(self, request):
         budgets = Budget.objects.all()
@@ -117,6 +130,9 @@ class BudgetListView(View):
 
 @method_decorator(login_required, name='dispatch')
 class SavingsListView(View):
+    """
+    View for listing savings.
+    """
     def get(self, request):
         savings = Savings.objects.all()
         return render(request, 'savings_list.html', {'savings': savings})
@@ -124,6 +140,9 @@ class SavingsListView(View):
 
 @method_decorator(login_required, name='dispatch')
 class IncomeDeleteView(View):
+    """
+    View for deleting an income entry.
+    """
     def post(self, request, pk):
         income = get_object_or_404(Income, pk=pk)
 
@@ -140,6 +159,9 @@ class IncomeDeleteView(View):
 
 
 class HomeView(View):
+    """
+    View for displaying the home page.
+    """
     @method_decorator(login_required)
     def get(self, request):
         return render(request, 'home.html')
@@ -147,15 +169,20 @@ class HomeView(View):
 
 @method_decorator(login_required, name='dispatch')
 class ExpenseFormView(View):
+    """
+    View for adding a new expense.
+    """
     def get(self, request):
+        """Handle GET request for rendering the expense form."""
         form = ExpenseForm()
         return render(request, 'expense_form.html', {'form': form})
 
     def post(self, request):
+        """Handle POST request for submitting the expense form."""
         form = ExpenseForm(request.POST)
         if form.is_valid():
             expense = form.save(commit=False)
-            # Przypisz wydatek do odpowiedniego budżetu
+            # Assign the expense to the appropriate budget
             budget, created = Budget.objects.get_or_create(name='Mój Budżet')
             budget.total_income -= expense.amount
             budget.save()
@@ -167,9 +194,13 @@ class ExpenseFormView(View):
 
 @method_decorator(login_required, name='dispatch')
 class ExpenseCategoryAddView(View):
-    template_name = 'add_expense_category.html'
 
+    template_name = 'add_expense_category.html'
+    """
+    View for adding a new expense category.
+    """
     def get(self, request):
+        """Handle GET request for rendering the expense category form."""
         form = ExpenseCategoryForm()
         categories = ExpenseCategory.objects.all()  # Pobierz istniejące kategorie
         return render(request, self.template_name, {'form': form, 'categories': categories})
@@ -185,13 +216,18 @@ class ExpenseCategoryAddView(View):
 
 @method_decorator(login_required, name='dispatch')
 class ExpenseCategoryDeleteView(View):
+    """
+    View for deleting an expense category.
+    """
     template_name = 'delete_expense_category.html'
 
     def get(self, request, category_id):
+        """Handle GET request for rendering the confirmation page for deleting an expense category."""
         category = ExpenseCategory.objects.get(id=category_id)
         return render(request, self.template_name, {'category': category})
 
     def post(self, request, category_id):
+        """Handle POST request for deleting an expense category."""
         category = ExpenseCategory.objects.get(id=category_id)
         if request.method == 'POST':
             category.delete()
@@ -201,6 +237,9 @@ class ExpenseCategoryDeleteView(View):
 
 @method_decorator(login_required, name='dispatch')
 class DeleteCategoryView(View):
+    """
+    View for confirming the deletion of an expense category.
+    """
     model = ExpenseCategory
     template_name = 'category_confirm_delete.html'
     success_url = reverse_lazy('name-of-list-view')
@@ -208,6 +247,9 @@ class DeleteCategoryView(View):
 
 @method_decorator(login_required, name='dispatch')
 class DeleteExpenseView(DeleteView):
+    """
+    View for confirming the deletion of an expense.
+    """
     model = Expense
     template_name = 'expense_confirm_delete.html'
     success_url = reverse_lazy('expense-list')  # Przekierowanie na listę wydatków
@@ -215,6 +257,9 @@ class DeleteExpenseView(DeleteView):
 
 @method_decorator(login_required, name='dispatch')
 class MoveToSavingsView(View):
+    """
+    View for moving funds from a budget to savings.
+    """
     template_name = 'move_to_savings.html'
 
     def get(self, request, *args, **kwargs):
@@ -226,7 +271,7 @@ class MoveToSavingsView(View):
 
         if form.is_valid():
             amount_to_move = form.cleaned_data['amount']
-            from_budget_id = form.cleaned_data['from_budget']  # To będzie ID budżetu
+            from_budget_id = form.cleaned_data['from_budget']  # This will be the budget ID
             to_savings_id = form.cleaned_data['to_savings']
 
             try:
@@ -251,6 +296,9 @@ class MoveToSavingsView(View):
 
 @method_decorator(login_required, name='dispatch')
 class CreateBudgetView(View):
+    """
+    View for creating a new budget.
+    """
     template_name = 'create_budget.html'
 
     def post(self, request, *args, **kwargs):
@@ -271,6 +319,9 @@ class CreateBudgetView(View):
 
 @method_decorator(login_required, name='dispatch')
 class BudgetListView(View):
+    """
+    View for displaying the list of budgets.
+    """
     template_name = 'budget_list.html'
 
     def get(self, request, *args, **kwargs):
@@ -281,6 +332,9 @@ class BudgetListView(View):
 
 @method_decorator(login_required, name='dispatch')
 class SetDefaultUserView(View):
+    """
+    View for setting the default user for budgets.
+    """
     template_name = 'default_user_set.html'
 
     def get(self, request, *args, **kwargs):
@@ -291,6 +345,9 @@ class SetDefaultUserView(View):
 
 @method_decorator(login_required, name='dispatch')
 class CreateSavingsView(View):
+    """
+    View for creating a new savings entry.
+    """
     template_name = 'create_savings.html'
 
     def get(self, request, *args, **kwargs):
@@ -308,6 +365,9 @@ class CreateSavingsView(View):
 
 @method_decorator(login_required, name='dispatch')
 class DeleteSavingsView(View):
+    """
+    View for deleting a savings entry.
+    """
     def post(self, request, *args, **kwargs):
         form = DeleteSavingsForm(request.POST)
 
